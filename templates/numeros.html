@@ -148,9 +148,16 @@
                 // Actualizar el color del número
                 document.querySelectorAll('.numero').forEach(function (element) {
                     if (element.textContent === numero) {
-                        element.className = "numero " + estado;
+                        element.className = "numero " + estado; // Actualiza el color
+                        element.innerHTML = numero + " (" + compradorInput + ")"; // Muestra el nombre del comprador
                     }
                 });
+
+                // Ocultar el formulario después de la actualización
+                document.getElementById("formulario").style.display = "none";
+            })
+            .catch(error => {
+                alert("Ocurrió un error. Por favor, inténtalo de nuevo.");
             });
         };
     </script>
