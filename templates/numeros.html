@@ -3,125 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rifa</title>
+    <title>Rifa de Smart TV o $1'500,000</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .numero {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .disponible {
-            background-color: lightgray;
-            color: black;
-        }
-
-        .vendido_no_pagado {
-            background-color: red;
-            color: white;
-        }
-
-        .vendido_pagado {
+        /* Estilos para los números */
+        .numero.vendido_pagado {
             background-color: green;
             color: white;
         }
 
-        .ocupado {
-            background-color: lightgrey;
+        .numero.vendido_no_pagado {
+            background-color: red;
             color: white;
         }
 
-        .comprador {
-            margin-top: 10px;
-        }
-
-        .form-container {
+        /* Estilo del formulario */
+        #formulario {
+            display: none;
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 10px;
             margin-top: 20px;
-            text-align: center;
         }
 
-        input, select {
-            padding: 5px;
-            margin: 10px;
+        label {
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Rifa de Smart tv o 1'500.000</h1>
 
-    <div class="container">
-        {% for numero in numeros %}
-            <div class="numero 
-                {% if numero['estado'] == 'disponible' %}
-                    disponible
-                {% elif numero['estado'] == 'vendido' and not numero['pagado'] %}
-                    vendido_no_pagado
-                {% elif numero['estado'] == 'vendido' and numero['pagado'] %}
-                    vendido_pagado
-                {% endif %}
-                " onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}')">
-                {{ numero['numero'] }}
-            </div>
-        {% endfor %}
+    <h1>Rifa de Smart TV o $1'500,000</h1>
+    <div id="rifa">
+        <table>
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Estado</th>
+                    <th>Comprador</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí se llenarán los números disponibles -->
+                <tr>
+                    <td class="numero">1</td>
+                    <td class="estado">Disponible</td>
+                    <td class="comprador"></td>
+                    <td><button class="btnActualizar" data-numero="1">Actualizar</button></td>
+                </tr>
+                <tr>
+                    <td class="numero">2</td>
+                    <td class="estado">Disponible</td>
+                    <td class="comprador"></td>
+                    <td><button class="btnActualizar" data-numero="2">Actualizar</button></td>
+                </tr>
+                <tr>
+                    <td class="numero">3</td>
+                    <td class="estado">Deber</td>
+                    <td class="comprador"></td>
+                    <td><button class="btnActualizar" data-numero="3">Actualizar</button></td>
+                </tr>
+                <!-- Aquí agregarás más filas según sea necesario -->
+            </tbody>
+        </table>
     </div>
 
-    <div class="comprador" id="comprador">
-        <!-- El nombre del comprador se mostrará aquí -->
-    </div>
+    <!-- Formulario para actualizar la rifa -->
+    <div id="formulario">
+        <h2>Actualizar Número de Rifa</h2>
+        <form id="formActualizar" method="post">
+            <label for="numero">Número:</label>
+            <input type="text" id="numero" name="numero" required disabled>
 
-    <div class="form-container" id="formulario" style="display:none;">
-        <h2>Actualizar Número: <span id="numeroSeleccionado"></span></h2>
-        <form id="formActualizar" method="POST">
-            <input type="hidden" name="numero" id="numero">
-            <input type="text" name="comprador" id="compradorInput" placeholder="Ingresa tu nombre" required>
-            <br>
-            <label>
-                Pagado:
-                <select name="pagado" id="pagado">
-                    <option value="true">Sí</option>
-                    <option value="false">No</option>
-                </select>
-            </label>
-            <br>
-            <button type="submit" id="submitBtn">Actualizar</button>
+            <label for="compradorInput">Comprador:</label>
+            <input type="text" id="compradorInput" name="comprador" required>
+
+            <label for="pagado">Pagado:</label>
+            <select id="pagado" name="pagado">
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+
+            <button type="submit">Actualizar</button>
         </form>
     </div>
 
     <script>
-        function mostrarFormulario(numero, comprador, pagado, estado) {
-            document.getElementById("numero").value = numero;
-            document.getElementById("numeroSeleccionado").textContent = numero;
+        // Mostrar el formulario al hacer click en el botón de actualización
+        document.querySelectorAll(".btnActualizar").forEach(button => {
+            button.onclick = function() {
+                var numero = this.dataset.numero;
+                var estado = this.closest("tr").querySelector(".estado").textContent;
+                
+                // Solo se muestra el formulario si el estado es 'disponible' o 'debe'
+                if (estado === "Disponible" || estado === "Deber") {
+                    document.getElementById("numero").value = numero;
+                    document.getElementById("formulario").style.display = "block";
+                } else {
+                    alert("Este número no se puede actualizar porque ya está vendido.");
+                }
+            };
+        });
 
-            // Mostrar nombre del comprador si existe
-            document.getElementById("compradorInput").value = comprador || "";
-            
-            // Si ya tiene comprador, deshabilitar el campo de nombre
-            document.getElementById("compradorInput").disabled = comprador !== "";
-            
-            // Establecer el valor de pagado
-            document.getElementById("pagado").value = pagado ? "true" : "false";
-
-            // Mostrar el formulario
-            document.getElementById("formulario").style.display = "block";
-        }
-
+        // Manejo del formulario de actualización
         document.getElementById("formActualizar").onsubmit = function(event) {
             event.preventDefault();
 
@@ -129,10 +113,12 @@
             var compradorInput = document.getElementById("compradorInput").value;
             if (!compradorInput.trim()) {
                 alert("El nombre es obligatorio.");
-                return; // No enviar el formulario si no se ingresó nombre
+                return;
             }
 
             var form = new FormData(event.target);
+
+            // Enviar los datos al servidor
             fetch("/actualizar", {
                 method: "POST",
                 body: form
@@ -141,7 +127,7 @@
             .then(data => {
                 alert(data.message);
 
-                // Cambiar el color según el estado pagado
+                // Cambiar el color según el estado 'pagado' o 'no pagado'
                 var numero = document.getElementById("numero").value;
                 var estado = document.getElementById("pagado").value === "true" ? "vendido_pagado" : "vendido_no_pagado";
 
@@ -152,10 +138,14 @@
                     }
                 });
 
-                // Ocultar el formulario
+                // Ocultar el formulario después de actualizar
                 document.getElementById("formulario").style.display = "none";
+            })
+            .catch(error => {
+                console.error("Error al enviar el formulario:", error);
             });
         };
     </script>
+
 </body>
 </html>
