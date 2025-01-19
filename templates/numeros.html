@@ -102,10 +102,13 @@
             <div class="numero 
                 {% if numero['estado'] == 'disponible' %}
                     disponible
-                {% elif numero['estado'] == 'vendido' and not numero['pagado'] %}
-                    vendido_no_pagado
-                {% elif numero['estado'] == 'vendido' and numero['pagado'] %}
-                    vendido_pagado
+                {% elif numero['estado'] == 'vendido' %}
+                    {% if numero['pagado']%}
+                    
+                        vendido_pagado
+                    {% else %}
+                        vendido_no_pagado
+                    {% endif %}
                 {% endif %}
                 " onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}')">
                 {{ numero['numero'] }}
