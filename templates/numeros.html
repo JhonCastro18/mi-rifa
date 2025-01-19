@@ -68,7 +68,7 @@
 
     <div class="container">
         {% for numero in numeros %}
-            <div class="numero 
+            <div id="numero-{{ numero['numero'] }}" class="numero 
                 {% if numero['estado'] == 'disponible' %}
                     disponible
                 {% elif numero['estado'] == 'vendido' and not numero['pagado'] %}
@@ -140,7 +140,19 @@
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-                window.location.reload();
+
+                // Actualizar el color del número sin recargar la página
+                var numero = document.getElementById("numero").value;
+                var estado = document.getElementById("pagado").value;
+                var numeroElemento = document.getElementById("numero-" + numero);
+
+                if (estado === "true") {
+                    numeroElemento.classList.remove("vendido_no_pagado");
+                    numeroElemento.classList.add("vendido_pagado");
+                } else {
+                    numeroElemento.classList.remove("vendido_pagado");
+                    numeroElemento.classList.add("vendido_no_pagado");
+                }
             });
         };
     </script>
