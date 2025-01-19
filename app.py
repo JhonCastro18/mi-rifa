@@ -32,20 +32,23 @@ def mostrar_numeros():
 @app.route("/actualizar", methods=["POST"])
 def actualizar_numero():
     numero = request.form["numero"]
-    comprador = request.form.get("comprador", "Anónimo")
+    comprador = request.form.get("comprador")
     pagado = request.form.get("pagado") == 'true'
+
+    # Si no se proporcionó un nombre de comprador, no lo actualizamos, manteniendo el nombre anterior
+    if not comprador:
+        comprador = None  # Permite que el comprador se quede como None si no se actualiza
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Actualizar el número en la base de datos
+    # Actualizar el número en la base de datos solo si el comprador se ha proporcionado o el número está disponible
     cursor.execute("""
         UPDATE rifas
         SET comprador = ?, pagado = ? 
-        WHERE numero = ?  AND (estado = 'disponible' OR estado = 'debe')
+        WHERE numero = ? AND (estado = 'disponible' OR estado = 'debe')
     """, (comprador, pagado, numero))
 
-    # Confirmar la transacción y cerrar la conexión
     conn.commit()
     conn.close()
 
