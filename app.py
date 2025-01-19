@@ -23,7 +23,7 @@ def mostrar_numeros():
         'numero': f'{numero[0]:03}',  # Formatea el número a 3 dígitos
         'estado': numero[1],
         'comprador': numero[2] if numero[2] else "",  # Si el comprador es vacío, mostrar vacío
-        'pagado': numero[3]
+        'pagado': numero[3]  # Asumir que pagado es un valor booleano
     } for numero in numeros]
 
     return render_template("numeros.html", numeros=numeros_formateados)

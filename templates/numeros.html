@@ -68,7 +68,7 @@
 
     <div class="container">
         {% for numero in numeros %}
-            <div id="numero-{{ numero['numero'] }}" class="numero 
+            <div class="numero 
                 {% if numero['estado'] == 'disponible' %}
                     disponible
                 {% elif numero['estado'] == 'vendido' and not numero['pagado'] %}
@@ -76,7 +76,7 @@
                 {% elif numero['estado'] == 'vendido' and numero['pagado'] %}
                     vendido_pagado
                 {% endif %}
-                " onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}')">
+                " id="numero-{{ numero['numero'] }}">
                 {{ numero['numero'] }}
             </div>
         {% endfor %}
@@ -105,23 +105,6 @@
     </div>
 
     <script>
-        function mostrarFormulario(numero, comprador, pagado, estado) {
-            document.getElementById("numero").value = numero;
-            document.getElementById("numeroSeleccionado").textContent = numero;
-
-            // Mostrar nombre del comprador si existe
-            document.getElementById("compradorInput").value = comprador || "";
-            
-            // Si ya tiene comprador, deshabilitar el campo de nombre
-            document.getElementById("compradorInput").disabled = comprador !== "";
-            
-            // Establecer el valor de pagado
-            document.getElementById("pagado").value = pagado ? "true" : "false";
-
-            // Mostrar el formulario
-            document.getElementById("formulario").style.display = "block";
-        }
-
         document.getElementById("formActualizar").onsubmit = function(event) {
             event.preventDefault();
 
@@ -140,19 +123,7 @@
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-
-                // Actualizar el color del número sin recargar la página
-                var numero = document.getElementById("numero").value;
-                var estado = document.getElementById("pagado").value;
-                var numeroElemento = document.getElementById("numero-" + numero);
-
-                if (estado === "true") {
-                    numeroElemento.classList.remove("vendido_no_pagado");
-                    numeroElemento.classList.add("vendido_pagado");
-                } else {
-                    numeroElemento.classList.remove("vendido_pagado");
-                    numeroElemento.classList.add("vendido_no_pagado");
-                }
+                window.location.reload(); // Recargar para reflejar los cambios
             });
         };
     </script>
