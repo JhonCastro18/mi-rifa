@@ -83,15 +83,6 @@
         button:hover {
             background-color: #0056b3;
         }
-
-        .cancelar-btn {
-            background-color: #d9534f;
-            margin-top: 10px;
-        }
-
-        .cancelar-btn:hover {
-            background-color: #c9302c;
-        }
     </style>
 </head>
 <body>
@@ -102,13 +93,10 @@
             <div class="numero 
                 {% if numero['estado'] == 'disponible' %}
                     disponible
-                {% elif numero['estado'] == 'vendido' %}
-                    {% if numero['pagado'] %}
-                        vendido_pagado  <!-- Color verde si está pagado -->
-                    
-                    {% else %}
-                        vendido_no_pagado
-                    {% endif %}
+                {% elif numero['estado'] == 'vendido' and not numero['pagado'] %}
+                    vendido_no_pagado
+                {% elif numero['estado'] == 'vendido' and numero['pagado'] %}
+                    vendido_pagado
                 {% endif %}
                 " onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}')">
                 {{ numero['numero'] }}
@@ -132,7 +120,6 @@
             </label>
             <br>
             <button type="submit" id="submitBtn">Actualizar</button>
-            <button type="button" class="cancelar-btn" onclick="cerrarFormulario()">Cancelar</button>
         </form>
     </div>
 
@@ -155,12 +142,6 @@
 
             // Establecer el valor de pagado
             document.getElementById("pagado").value = pagado ? "true" : "false";
-        }
-
-        // Función para cerrar el formulario sin hacer cambios
-        function cerrarFormulario() {
-            var formulario = document.getElementById("formulario");
-            formulario.style.display = "none";  // Ocultar el formulario
         }
 
         // Procesar el formulario cuando se envíe
