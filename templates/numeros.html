@@ -98,7 +98,7 @@
                 {% elif numero['estado'] == 'vendido' and numero['pagado'] %}
                     vendido_pagado
                 {% endif %}
-                " onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}', this)">
+                " onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}')">
                 {{ numero['numero'] }}
             </div>
         {% endfor %}
@@ -125,7 +125,7 @@
 
     <script>
         // Función para mostrar el formulario y mostrar los detalles del número seleccionado
-        function mostrarFormulario(numero, comprador, pagado, estado, elemento) {
+        function mostrarFormulario(numero, comprador, pagado, estado) {
             // Mostrar el formulario
             var formulario = document.getElementById("formulario");
             formulario.style.display = "block";
@@ -142,14 +142,6 @@
 
             // Establecer el valor de pagado
             document.getElementById("pagado").value = pagado ? "true" : "false";
-
-            // Posicionar el formulario cerca del número seleccionado
-            var rect = elemento.getBoundingClientRect();
-            formulario.style.top = rect.top + window.scrollY + 60 + "px"; // Se coloca cerca del número
-            formulario.style.left = rect.left + window.scrollX - 150 + "px"; // Se ajusta para centrar el formulario
-
-            // Evitar que se mueva cuando se desplaza la página
-            window.scrollTo(0, rect.top + window.scrollY - 100);
         }
 
         // Procesar el formulario cuando se envíe
