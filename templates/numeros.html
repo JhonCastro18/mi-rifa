@@ -83,6 +83,15 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        .cancelar-btn {
+            background-color: #d9534f;
+            margin-top: 10px;
+        }
+
+        .cancelar-btn:hover {
+            background-color: #c9302c;
+        }
     </style>
 </head>
 <body>
@@ -120,6 +129,7 @@
             </label>
             <br>
             <button type="submit" id="submitBtn">Actualizar</button>
+            <button type="button" class="cancelar-btn" onclick="cerrarFormulario()">Cancelar</button>
         </form>
     </div>
 
@@ -142,6 +152,12 @@
 
             // Establecer el valor de pagado
             document.getElementById("pagado").value = pagado ? "true" : "false";
+        }
+
+        // Función para cerrar el formulario sin hacer cambios
+        function cerrarFormulario() {
+            var formulario = document.getElementById("formulario");
+            formulario.style.display = "none";  // Ocultar el formulario
         }
 
         // Procesar el formulario cuando se envíe
