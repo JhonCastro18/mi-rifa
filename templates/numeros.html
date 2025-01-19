@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .numero {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .disponible {
+            background-color: lightgray;
+            color: black;
+        }
+
+        .vendido_no_pagado {
+            background-color: red;
+            color: white;
+        }
+
+        .vendido_pagado {
+            background-color: green;
+            color: white;
+        }
+
+        .ocupado {
+            background-color: lightgrey;
+            color: white;
+        }
+
+        .comprador {
+            margin-top: 10px;
+        }
+
+        .form-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        input, select {
+            padding: 5px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rifa de Números</h1>
+
+    <div class="container">
+        {% for numero in numeros %}
+            <div class="numero 
+                {% if numero['estado'] == 'disponible' %}
+                    disponible
+                {% elif numero['estado'] == 'vendido' and not numero['pagado'] %}
+                    vendido_no_pagado
+                {% elif numero['estado'] == 'vendido' and numero['pagado'] %}
+                    vendido_pagado
+                {% endif %}
+                " onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}')">
+                {{ numero['numero'] }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="comprador" id="comprador">
+        <!-- El nombre del comprador se mostrará aquí -->
+    </div>
+
+    <div class="form-container" id="formulario" style="display:none;">
+        <h2>Actualizar Número: <span id="numeroSeleccionado"></span></h2>
+        <form id="formActualizar" method="POST">
+            <input type="hidden" name="numero" id="numero">
+            <input type="text" name="comprador" id="compradorInput" placeholder="Ingresa tu nombre" required>
+            <br>
+            <label>
+                Pagado:
+                <select name="pagado" id="pagado">
+                    <option value="true">Sí</option>
+                    <option value="false">No</option>
+                </select>
+            </label>
+            <br>
+            <button type="submit" id="submitBtn">Actualizar</button>
+        </form>
+    </div>
+
+    <script>
+        function mostrarFormulario(numero, comprador, pagado, estado) {
+            document.getElementById("numero").value = numero;
+            document.getElementById("numeroSeleccionado").textContent = numero;
+
+            // Mostrar nombre del comprador si existe
+            document.getElementById("compradorInput").value = comprador || "";
+            
+            // Si ya tiene comprador, deshabilitar el campo de nombre
+            document.getElementById("compradorInput").disabled = comprador !== "";
+            
+            // Establecer el valor de pagado
+            document.getElementById("pagado").value = pagado ? "true" : "false";
+
+            // Mostrar el formulario
+            document.getElementById("formulario").style.display = "block";
+        }
+
+        document.getElementById("formActualizar").onsubmit = function(event) {
+            event.preventDefault();
+
+            // Validar que el campo de nombre no esté vacío
+            var compradorInput = document.getElementById("compradorInput").value;
+            if (!compradorInput.trim()) {
+                alert("El nombre es obligatorio.");
+                return; // No enviar el formulario si no se ingresó nombre
+            }
+
+            var form = new FormData(event.target);
+            fetch("/actualizar", {
+                method: "POST",
+                body: form
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                window.location.reload();
+            });
+        };
+    </script>
+</body>
+</html>
