@@ -34,7 +34,7 @@ def actualizar_numero():
     numero = request.form["numero"]
     comprador = request.form.get("comprador", "Anónimo")
     pagado = request.form.get("pagado") == 'true'
-     
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -42,12 +42,11 @@ def actualizar_numero():
     cursor.execute("""
         UPDATE rifas
         SET comprador = ?, pagado = ?, 
-        WHERE numero = ? AND (estado = 'disponible' OR estado = 'debe')
+        WHERE numero = ?  AND (estado = 'disponible' OR estado = 'debe')
     """, (comprador, pagado, numero))
 
     # Confirmar la transacción y cerrar la conexión
     conn.commit()
-     
     conn.close()
 
     return jsonify({"message": f"El número {numero} ha sido actualizado."}), 200
