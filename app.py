@@ -3,10 +3,16 @@ import sqlite3
 
 app = Flask(__name__)
 
+# Función para conectar a la base de datos y ejecutar consultas
+def get_db_connection():
+    conn = sqlite3.connect("rifa.db")
+    conn.row_factory = sqlite3.Row  # Esto facilita acceder a los resultados como diccionarios
+    return conn
+
 # Muestra los números disponibles
 @app.route("/")
 def mostrar_numeros():
-    conn = sqlite3.connect("rifa.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT numero, estado, comprador, pagado FROM rifas")
     numeros = cursor.fetchall()
@@ -29,8 +35,7 @@ def actualizar_numero():
     comprador = request.form.get("comprador", "Anónimo")
     pagado = request.form.get("pagado") == 'true'
 
-    # Conectar a la base de datos
-    conn = sqlite3.connect("rifa.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     # Actualizar el número en la base de datos
@@ -40,6 +45,7 @@ def actualizar_numero():
         WHERE numero = ? AND estado = 'vendido'
     """, (comprador, pagado, numero))
 
+    # Confirmar la transacción y cerrar la conexión
     conn.commit()
     conn.close()
 

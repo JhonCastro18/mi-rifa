@@ -145,19 +145,15 @@
                 var numero = document.getElementById("numero").value;
                 var estado = document.getElementById("pagado").value === "true" ? "vendido_pagado" : "vendido_no_pagado";
 
-                // Actualizar el color del número
+                // Actualizar el color del número en la interfaz
                 document.querySelectorAll('.numero').forEach(function (element) {
                     if (element.textContent === numero) {
-                        element.className = "numero " + estado; // Actualiza el color
-                        element.innerHTML = numero + " (" + compradorInput + ")"; // Muestra el nombre del comprador
+                        element.className = "numero " + estado;
                     }
                 });
 
-                // Ocultar el formulario después de la actualización
+                // Ocultar el formulario
                 document.getElementById("formulario").style.display = "none";
-            })
-            .catch(error => {
-                alert("Ocurrió un error. Por favor, inténtalo de nuevo.");
             });
         };
     </script>
