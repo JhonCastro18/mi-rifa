@@ -28,21 +28,24 @@
             cursor: pointer;
         }
 
-        /* Fondo de los números */
         .disponible {
-            background-color: lightgray; /* Fondo para números disponibles */
+            background-color: lightgray;
+            color: black;
         }
 
         .vendido_no_pagado {
-            background-color: red; /* Fondo para números vendidos pero no pagados */
+            background-color: red;
+            color: white;
         }
 
         .vendido_pagado {
-            background-color: green; /* Fondo para números vendidos y pagados */
+            background-color: green;
+            color: white;
         }
 
         .ocupado {
-            background-color: lightgrey; /* Fondo para números ocupados */
+            background-color: lightgrey;
+            color: white;
         }
 
         .comprador {
@@ -72,9 +75,8 @@
                     vendido_no_pagado
                 {% elif numero['estado'] == 'vendido' and numero['pagado'] %}
                     vendido_pagado
-                {% endif %}"
-                data-numero="{{ numero['numero'] }}"
-                onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}')">
+                {% endif %}
+                " onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}')">
                 {{ numero['numero'] }}
             </div>
         {% endfor %}
@@ -109,10 +111,10 @@
 
             // Mostrar nombre del comprador si existe
             document.getElementById("compradorInput").value = comprador || "";
-
+            
             // Si ya tiene comprador, deshabilitar el campo de nombre
             document.getElementById("compradorInput").disabled = comprador !== "";
-
+            
             // Establecer el valor de pagado
             document.getElementById("pagado").value = pagado ? "true" : "false";
 
@@ -138,40 +140,9 @@
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-
-                // Obtener el número actualizado y el estado
-                var numero = document.getElementById("numero").value;
-                var estado = document.getElementById("estado").value;
-                var pagado = document.getElementById("pagado").value;
-
-                // Cambiar el fondo del número actualizado
-                actualizarFondoNumero(numero, estado, pagado);
-
-                // Cerrar el formulario
-                document.getElementById("formulario").style.display = "none";
-            })
-            .catch(error => {
-                console.error("Error al actualizar:", error);
+                window.location.reload();
             });
         };
-
-        // Función para actualizar el fondo del número
-        function actualizarFondoNumero(numero, estado, pagado) {
-            // Buscar el número correspondiente en la interfaz
-            var numeroDiv = document.querySelector(`.numero[data-numero='${numero}']`);
-
-            // Actualizar el fondo según el estado
-            if (estado === 'disponible') {
-                numeroDiv.classList.remove('vendido_no_pagado', 'vendido_pagado');
-                numeroDiv.classList.add('disponible');
-            } else if (estado === 'vendido' && !pagado) {
-                numeroDiv.classList.remove('disponible', 'vendido_pagado');
-                numeroDiv.classList.add('vendido_no_pagado');
-            } else if (estado === 'vendido' && pagado) {
-                numeroDiv.classList.remove('disponible', 'vendido_no_pagado');
-                numeroDiv.classList.add('vendido_pagado');
-            }
-        }
     </script>
 </body>
 </html>

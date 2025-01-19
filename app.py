@@ -42,7 +42,7 @@ def actualizar_numero():
     cursor.execute("""
         UPDATE rifas
         SET comprador = ?, pagado = ? 
-        WHERE numero = ?  AND (estado = 'disponible' OR estado = 'debe' OR estado = 'vendido')
+        WHERE numero = ?  AND (estado = 'disponible' OR estado = 'debe')
     """, (comprador, pagado, numero))
 
     # Confirmar la transacción y cerrar la conexión
