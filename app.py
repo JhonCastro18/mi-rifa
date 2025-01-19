@@ -23,7 +23,7 @@ def mostrar_numeros():
         'numero': f'{numero[0]:03}',  # Formatea el número a 3 dígitos
         'estado': numero[1],
         'comprador': numero[2] if numero[2] else "",  # Si el comprador es vacío, mostrar vacío
-        'pagado': numero[3]  # Asumir que pagado es un valor booleano
+        'pagado': numero[3]
     } for numero in numeros]
 
     return render_template("numeros.html", numeros=numeros_formateados)
@@ -32,23 +32,20 @@ def mostrar_numeros():
 @app.route("/actualizar", methods=["POST"])
 def actualizar_numero():
     numero = request.form["numero"]
-    comprador = request.form.get("comprador")
+    comprador = request.form.get("comprador", "Anónimo")
     pagado = request.form.get("pagado") == 'true'
-
-    # Si no se proporcionó un nombre de comprador, no lo actualizamos, manteniendo el nombre anterior
-    if not comprador:
-        comprador = None  # Permite que el comprador se quede como None si no se actualiza
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Actualizar el número en la base de datos solo si el comprador se ha proporcionado o el número está disponible
+    # Actualizar el número en la base de datos
     cursor.execute("""
         UPDATE rifas
-        SET comprador = ?, pagado = ? 
-        WHERE numero = ? AND (estado = 'disponible' OR estado = 'debe')
+        SET comprador = ?, pagado = ?, estado = 'vendido'
+        WHERE numero = ? AND estado = 'disponible'
     """, (comprador, pagado, numero))
 
+    # Confirmar la transacción y cerrar la conexión
     conn.commit()
     conn.close()
 
