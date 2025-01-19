@@ -140,7 +140,17 @@
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-                window.location.reload();
+
+                // Cambiar el color según el estado pagado
+                var numero = document.getElementById("numero").value;
+                var estado = document.getElementById("pagado").value === "true" ? "vendido_pagado" : "vendido_no_pagado";
+
+                // Actualizar el color del número
+                document.querySelectorAll('.numero').forEach(function (element) {
+                    if (element.textContent === numero) {
+                        element.className = "numero " + estado;
+                    }
+                });
             });
         };
     </script>

@@ -29,13 +29,17 @@ def actualizar_numero():
     comprador = request.form.get("comprador", "Anónimo")
     pagado = request.form.get("pagado") == 'true'
 
+    # Conectar a la base de datos
     conn = sqlite3.connect("rifa.db")
     cursor = conn.cursor()
+
+    # Actualizar el número en la base de datos
     cursor.execute("""
         UPDATE rifas
         SET comprador = ?, pagado = ?
         WHERE numero = ? AND estado = 'vendido'
     """, (comprador, pagado, numero))
+
     conn.commit()
     conn.close()
 
