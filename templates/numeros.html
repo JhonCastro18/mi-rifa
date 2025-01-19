@@ -103,9 +103,9 @@
                 {% if numero['estado'] == 'disponible' %}
                     disponible
                 {% elif numero['estado'] == 'vendido' %}
-                    {% if numero['pagado']%}
+                    {% if numero['pagado'] %}
+                        vendido_pagado  <!-- Color verde si está pagado -->
                     
-                        vendido_pagado
                     {% else %}
                         vendido_no_pagado
                     {% endif %}
