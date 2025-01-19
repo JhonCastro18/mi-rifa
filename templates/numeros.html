@@ -124,13 +124,13 @@
     </div>
 
     <script>
-        // Mostrar el formulario de actualización cerca del número seleccionado
+        // Función para mostrar el formulario y mostrar los detalles del número seleccionado
         function mostrarFormulario(numero, comprador, pagado, estado, elemento) {
             // Mostrar el formulario
             var formulario = document.getElementById("formulario");
             formulario.style.display = "block";
             
-            // Obtener el número seleccionado y mostrarlo
+            // Mostrar el número seleccionado
             document.getElementById("numero").value = numero;
             document.getElementById("numeroSeleccionado").textContent = numero;
 
@@ -143,7 +143,7 @@
             // Establecer el valor de pagado
             document.getElementById("pagado").value = pagado ? "true" : "false";
 
-            // Posicionar el formulario cerca del número seleccionado (animación)
+            // Posicionar el formulario cerca del número seleccionado
             var rect = elemento.getBoundingClientRect();
             formulario.style.top = rect.top + window.scrollY + 60 + "px"; // Se coloca cerca del número
             formulario.style.left = rect.left + window.scrollX - 150 + "px"; // Se ajusta para centrar el formulario
