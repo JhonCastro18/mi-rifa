@@ -32,18 +32,37 @@ def mostrar_numeros():
 @app.route("/actualizar", methods=["POST"])
 def actualizar_numero():
     numero = request.form["numero"]
-    comprador = request.form.get("comprador", "Anónimo")
+    comprador = request.form.get("comprador")
     pagado = request.form.get("pagado") == 'true'
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Actualizar el número en la base de datos
-    cursor.execute("""
-        UPDATE rifas
-        SET comprador = ?, pagado = ?, estado = 'vendido'
-        WHERE numero = ? AND estado = 'disponible'
-    """, (comprador, pagado, numero))
+    # Verificar el estado actual del número
+    cursor.execute("SELECT estado, comprador FROM rifas WHERE numero = ?", (numero,))
+    resultado = cursor.fetchone()
+
+    if resultado:
+        estado_actual = resultado["estado"]
+        comprador_actual = resultado["comprador"]
+
+        if estado_actual == "vendido":
+            # Si el número ya está vendido, solo actualizar el estado de pagado
+            cursor.execute("""
+                UPDATE rifas
+                SET pagado = ?
+                WHERE numero = ?
+            """, (pagado, numero))
+        elif estado_actual == "disponible":
+            # Si el número está disponible, actualizar comprador, pagado y estado
+            cursor.execute("""
+                UPDATE rifas
+                SET comprador = ?, pagado = ?, estado = 'vendido'
+                WHERE numero = ?
+            """, (comprador or "Anónimo", pagado, numero))
+        else:
+            conn.close()
+            return jsonify({"message": "El número no se puede actualizar."}), 400
 
     # Confirmar la transacción y cerrar la conexión
     conn.commit()
