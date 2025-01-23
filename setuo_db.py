@@ -1,32 +1,31 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Jan 18 14:21:12 2025
-
-@author: karen
-"""
-
 import sqlite3
 
-# Conectamos con la base de datos (o la creamos si no existe)
-conn = sqlite3.connect("rifa.db")
+# Conectar a la base de datos (si no existe, se creará)
+conn = sqlite3.connect('rifa.db')
+
+# Crear un cursor
 cursor = conn.cursor()
 
-# Creamos una tabla para guardar los números de la rifa
-cursor.execute("""
+# Asegurarse de que la tabla existe y limpiarla
+cursor.execute("DROP TABLE IF EXISTS rifas")  # Limpiar tabla existente
+cursor.execute('''
 CREATE TABLE IF NOT EXISTS rifas (
-    numero INTEGER PRIMARY KEY,
+    numero TEXT PRIMARY KEY,
     estado TEXT DEFAULT 'disponible',
-    comprador TEXT
+    comprador TEXT,
+    pagado BOOLEAN DEFAULT FALSE
 )
-""")
+''')
 
-# Agregamos los números del 000 al 999 a la tabla
-cursor.execute("DELETE FROM rifas")  # Limpiamos por si ya hay datos
+# Insertar los números del 000 al 999 en la tabla
 for i in range(1000):
-    cursor.execute("INSERT INTO rifas (numero) VALUES (?)", (i,))
+    numero = f'{i:03}'  # Asegura que el número tenga tres dígitos
+    # Usamos INSERT OR IGNORE para evitar duplicados si ya existen
+    cursor.execute("INSERT OR IGNORE INTO rifas (numero, estado, comprador, pagado) VALUES (?, 'disponible', '', 0)", (numero,))
 
-# Guardamos los cambios y cerramos
+# Confirmar los cambios y cerrar la conexión
 conn.commit()
 conn.close()
 
-print("Base de datos creada con éxito.")
+print("Base de datos y tabla creadas correctamente.")

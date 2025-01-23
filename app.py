@@ -1,12 +1,16 @@
+import os
+import psycopg2
 from flask import Flask, render_template, request, jsonify
-import sqlite3
 
 app = Flask(__name__)
 
-# Función para conectar a la base de datos y ejecutar consultas
+# Obtener la URL de la base de datos desde la variable de entorno
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+# Función para conectar a la base de datos PostgreSQL
 def get_db_connection():
-    conn = sqlite3.connect("rifa.db")
-    conn.row_factory = sqlite3.Row  # Esto facilita acceder a los resultados como diccionarios
+    # Conectar a la base de datos de PostgreSQL usando la URL proporcionada por Render
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     return conn
 
 # Muestra los números disponibles
@@ -28,6 +32,26 @@ def mostrar_numeros():
 
     return render_template("numeros.html", numeros=numeros_formateados)
 
+# Busca un número específico
+@app.route("/buscar/<int:numero>")
+def buscar_numero(numero):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT numero, estado, comprador, pagado FROM rifas WHERE numero = ?", (numero,))
+    numero_info = cursor.fetchone()
+    conn.close()
+
+    if numero_info:
+        numero_formateado = {
+            'numero': f'{numero_info[0]:03}',
+            'estado': numero_info[1],
+            'comprador': numero_info[2] if numero_info[2] else "",
+            'pagado': numero_info[3]
+        }
+        return render_template("numero.html", numero=numero_formateado)
+    else:
+        return jsonify({"message": "Número no encontrado."}), 404
+
 # Marca un número como vendido o pagado
 @app.route("/actualizar", methods=["POST"])
 def actualizar_numero():
@@ -48,10 +72,10 @@ def actualizar_numero():
 
         if estado_actual == "vendido":
             # Si el número ya está vendido, solo actualizar el estado de pagado
-            cursor.execute("""
-                UPDATE rifas
-                SET pagado = ?
-                WHERE numero = ?
+            cursor.execute(""" 
+                UPDATE rifas 
+                SET pagado = ? 
+                WHERE numero = ? 
             """, (pagado, numero))
         elif estado_actual == "disponible":
             # Si el número está disponible, actualizar comprador, pagado y estado

@@ -97,6 +97,12 @@
 <body>
     <h1 style="text-align: center; margin-top: 20px;">Rifa de Smart TV o 1'500.000</h1>
 
+    <!-- Buscador -->
+    <div style="text-align: center; margin-top: 20px;">
+        <input type="text" id="buscarNumero" placeholder="Busca un número (0-999)" />
+        <button onclick="buscarNumero()">Buscar</button>
+    </div>
+
     <div class="container">
         {% for numero in numeros %}
             <div class="numero 
@@ -182,6 +188,17 @@
                 window.location.reload(); // Recargar para reflejar los cambios
             });
         };
+
+        // Función de búsqueda de número
+        function buscarNumero() {
+            var numeroBusqueda = document.getElementById("buscarNumero").value.trim();
+            if (numeroBusqueda) {
+                // Redirige a la página con el número buscado
+                window.location.href = "/buscar/" + numeroBusqueda;
+            } else {
+                alert("Por favor, ingresa un número.");
+            }
+        }
     </script>
 </body>
 </html>
