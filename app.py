@@ -9,7 +9,6 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 # Función para conectar a la base de datos PostgreSQL
 def get_db_connection():
-    # Conectar a la base de datos de PostgreSQL usando la URL proporcionada por Render
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     return conn
 
@@ -22,11 +21,10 @@ def mostrar_numeros():
     numeros = cursor.fetchall()
     conn.close()
 
-    # Formatear los números con tres cifras (ejemplo: 001, 005, 010)
     numeros_formateados = [{
-        'numero': f'{numero[0]:03}',  # Formatea el número a 3 dígitos
+        'numero': f'{numero[0]:03}',
         'estado': numero[1],
-        'comprador': numero[2] if numero[2] else "",  # Si el comprador es vacío, mostrar vacío
+        'comprador': numero[2] if numero[2] else "",
         'pagado': numero[3]
     } for numero in numeros]
 
@@ -37,7 +35,7 @@ def mostrar_numeros():
 def buscar_numero(numero):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT numero, estado, comprador, pagado FROM rifas WHERE numero = ?", (numero,))
+    cursor.execute("SELECT numero, estado, comprador, pagado FROM rifas WHERE numero = %s", (numero,))
     numero_info = cursor.fetchone()
     conn.close()
 
@@ -56,39 +54,34 @@ def buscar_numero(numero):
 @app.route("/actualizar", methods=["POST"])
 def actualizar_numero():
     numero = request.form["numero"]
-    comprador = request.form.get("comprador")
-    pagado = request.form.get("pagado") == 'true'
+    comprador = request.form.get("comprador", "")
+    pagado = request.form.get("pagado", 'false').lower() == 'true'
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Verificar el estado actual del número
-    cursor.execute("SELECT estado, comprador FROM rifas WHERE numero = ?", (numero,))
+    cursor.execute("SELECT estado, comprador FROM rifas WHERE numero = %s", (numero,))
     resultado = cursor.fetchone()
 
     if resultado:
-        estado_actual = resultado["estado"]
-        comprador_actual = resultado["comprador"]
+        estado_actual = resultado[0]
+        comprador_actual = resultado[1]
 
         if estado_actual == "vendido":
-            # Si el número ya está vendido, solo actualizar el estado de pagado
-            cursor.execute(""" 
-                UPDATE rifas 
-                SET pagado = ? 
-                WHERE numero = ? 
-            """, (pagado, numero))
+            cursor.execute("UPDATE rifas SET pagado = %s WHERE numero = %s", (pagado, numero))
         elif estado_actual == "disponible":
-            # Si el número está disponible, actualizar comprador, pagado y estado
             cursor.execute("""
                 UPDATE rifas
-                SET comprador = ?, pagado = ?, estado = 'vendido'
-                WHERE numero = ?
+                SET comprador = %s, pagado = %s, estado = 'vendido'
+                WHERE numero = %s
             """, (comprador or "Anónimo", pagado, numero))
         else:
             conn.close()
             return jsonify({"message": "El número no se puede actualizar."}), 400
+    else:
+        conn.close()
+        return jsonify({"message": "Número no encontrado en la base de datos."}), 404
 
-    # Confirmar la transacción y cerrar la conexión
     conn.commit()
     conn.close()
 

@@ -105,15 +105,17 @@
 
     <div class="container">
         {% for numero in numeros %}
-            <div class="numero 
+            <div 
+                class="numero 
                 {% if numero['estado'] == 'disponible' %}
                     disponible
                 {% elif numero['estado'] == 'vendido' and not numero['pagado'] %}
                     vendido_no_pagado
                 {% elif numero['estado'] == 'vendido' and numero['pagado'] %}
                     vendido_pagado
-                {% endif %}
-                " onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}')">
+                {% endif %}" 
+                data-numero="{{ numero['numero'] }}"
+                onclick="mostrarFormulario('{{ numero['numero'] }}', '{{ numero['comprador'] }}', {{ numero['pagado'] }}, '{{ numero['estado'] }}')">
                 {{ numero['numero'] }}
             </div>
         {% endfor %}
@@ -185,7 +187,18 @@
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-                window.location.reload(); // Recargar para reflejar los cambios
+
+                // Actualiza dinámicamente el color del número
+                var numero = document.getElementById("numero").value;
+                var pagado = document.getElementById("pagado").value === "true";
+
+                var numeroElemento = document.querySelector(`.numero[data-numero='${numero}']`);
+                if (numeroElemento) {
+                    numeroElemento.classList.remove("vendido_no_pagado", "vendido_pagado");
+                    numeroElemento.classList.add(pagado ? "vendido_pagado" : "vendido_no_pagado");
+                }
+
+                cerrarFormulario();
             });
         };
 
